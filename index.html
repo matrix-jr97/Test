@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ClientFlow — une expérience client simple, rapide et moderne.">
+  <title>ClientFlow — Votre assistant client</title>
+
+  <style>
+    :root {
+      --bg: #070708;
+      --panel: rgba(255,255,255,.055);
+      --panel-hover: rgba(255,255,255,.085);
+      --border: rgba(255,255,255,.11);
+      --text: #f4f4f5;
+      --muted: #96969d;
+      --accent: #d9d9df;
+      --shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(255,255,255,.09), transparent 35%),
+        radial-gradient(circle at 10% 90%, rgba(255,255,255,.035), transparent 30%),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 55px 55px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+    }
+
+    .container {
+      width: min(100% - 32px, 980px);
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 26px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: -.03em;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: linear-gradient(145deg, #252529, #0d0d0f);
+      box-shadow: inset 0 1px rgba(255,255,255,.08);
+      font-size: 13px;
+    }
+
+    .status {
+      color: #a9a9b0;
+      font-size: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+    }
+
+    main {
+      min-height: calc(100vh - 90px);
+      display: flex;
+      align-items: center;
+      padding: 55px 0 90px;
+    }
+
+    .hero {
+      text-align: center;
+      width: 100%;
+      animation: appear .8s ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #a9a9b0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d9d9df;
+      box-shadow: 0 0 14px rgba(255,255,255,.7);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0 auto;
+      font-size: clamp(42px, 8vw, 76px);
+      line-height: .98;
+      letter-spacing: -.065em;
+      font-weight: 760;
+      background: linear-gradient(180deg, #fff 0%, #b9b9bf 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      max-width: 570px;
+      margin: 24px auto 42px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .action {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 22px;
+      min-height: 82px;
+      color: var(--text);
+      text-decoration: none;
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.075),
+        rgba(255,255,255,.025)
+      );
+      box-shadow: 0 10px 35px rgba(0,0,0,.18);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: transform .25s ease, border-color .25s ease,
+        background .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+    }
+
+    .action::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 20%,
+        rgba(255,255,255,.08) 50%,
+        transparent 80%
+      );
+      transform: translateX(-100%);
+      transition: transform .6s ease;
+    }
+
+    .action:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,.23);
+      background: var(--panel-hover);
+      box-shadow: var(--shadow);
+    }
+
+    .action:hover::before {
+      transform: translateX(100%);
+    }
+
+    .action-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .action-title {
+      display: block;
+      font-weight: 650;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .action-description {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .arrow {
+      position: relative;
+      z-index: 1;
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: #cfcfd4;
+      transition: transform .25s ease;
+    }
+
+    .action:hover .arrow {
+      transform: translateX(3px);
+    }
+
+    footer {
+      margin-top: 48px;
+      color: #65656b;
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .modal.active {
+      display: grid;
+    }
+
+    .modal-box {
+      width: min(100%, 480px);
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #101012;
+      box-shadow: var(--shadow);
+      animation: modalIn .25s ease both;
+    }
+
+    .modal-box h2 {
+      font-size: 22px;
+      letter-spacing: -.035em;
+      margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .form {
+      display: grid;
+      gap: 12px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: rgba(255,255,255,.045);
+      color: var(--text);
+      padding: 14px;
+      outline: none;
+      font: inherit;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: rgba(255,255,255,.3);
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 13px 16px;
+      border-radius: 12px;
+      color: #111;
+      background: #e8e8eb;
+      font-weight: 650;
+    }
+
+    .btn.secondary {
+      color: #dddde2;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--border);
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(.97) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @media (max-width: 650px) {
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        padding-top: 35px;
+      }
+
+      .subtitle {
+        margin-bottom: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <span>ClientFlow</span>
+      </div>
+      <div class="status">● Disponible</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container hero">
+      <div class="eyebrow">
+        <span class="dot"></span>
+        Votre espace client
+      </div>
+
+      <h1>Comment pouvons-nous vous aider&nbsp;?</h1>
+
+      <p class="subtitle">
+        Une expérience simple, rapide et sans détour.
+        Choisissez l'action qui correspond à votre demande.
+      </p>
+
+      <div class="actions">
+        <a href="#" class="action" data-title="Demander un devis">
+          <span class="action-content">
+            <span class="action-title">Demander un devis</span>
+            <span class="action-description">Recevez une estimation personnalisée.</span>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a href="#" class="action" data-title="Prendre rendez-vous">
+          <span class="action-content">
+            <span class="action-title">Prendre rendez-vous</span>
+            <span class="action-description">Choisissez un créneau qui vous convient.</span>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a href="#" class="action" data-title="Poser une question">
+          <span class="action-content">
+            <span class="action-title">Poser une question</span>
+            <span class="action-description">Obtenez rapidement les informations souhaitées.</span>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+
+        <a href="#" class="action" data-title="Être rappelé">
+          <span class="action-content">
+            <span class="action-title">Être rappelé</span>
+            <span class="action-description">Laissez vos coordonnées et nous vous recontactons.</span>
+          </span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+
+      <footer>PROPULSÉ PAR CLIENTFLOW · VERSION DÉMO</footer>
+    </div>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <h2 id="modalTitle">Votre demande</h2>
+      <p>Remplissez ce formulaire. Cette version est une démo : les données ne sont pas encore envoyées à un commerce.</p>
+
+      <form class="form" id="demoForm">
+        <input type="text" placeholder="Votre nom" required>
+        <input type="email" placeholder="Votre adresse e-mail" required>
+        <textarea placeholder="Votre demande..." required></textarea>
+
+        <div class="form-buttons">
+          <button type="button" class="btn secondary" id="closeModal">Annuler</button>
+          <button type="submit" class="btn">Envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const closeModal = document.getElementById("closeModal");
+    const form = document.getElementById("demoForm");
+
+    document.querySelectorAll(".action").forEach(action => {
+      action.addEventListener("click", event => {
+        event.preventDefault();
+        modalTitle.textContent = action.dataset.title;
+        modal.classList.add("active");
+      });
+    });
+
+    closeModal.addEventListener("click", () => {
+      modal.classList.remove("active");
+    });
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) {
+        modal.classList.remove("active");
+      }
+    });
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      alert("Démo : votre demande a bien été enregistrée.");
+      form.reset();
+      modal.classList.remove("active");
+    });
+  </script>
+</body>
+</html>
